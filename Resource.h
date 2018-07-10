@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by SysTrayDemo.rc
+// Used by give-me-some-time.rc
 //
 #define IDC_MYICON                      2
 #define IDD_GIVEMESOMETIME_DIALOG       102

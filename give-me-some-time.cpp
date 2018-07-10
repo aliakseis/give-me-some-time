@@ -18,9 +18,8 @@ BOOL bDisable = FALSE;							// keep application state
 
 
 // Message handler for about box.
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM /*lParam*/)
 {
-    UNREFERENCED_PARAMETER(lParam);
     switch (message)
     {
     case WM_INITDIALOG:
@@ -170,7 +169,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 //   COMMENTS:
 //        In this function, we save the instance handle in a global variable and
 //        create and display the main program window.
-BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
+BOOL InitInstance(HINSTANCE hInstance, int /*nCmdShow*/)
 {
     hInst = hInstance; // Store instance handle in our global variable
 
