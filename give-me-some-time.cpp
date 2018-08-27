@@ -46,18 +46,15 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM /*lParam*/
 //  WM_DESTROY	- post a quit message and return
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    POINT lpClickPoint;
-
     switch (message)
     {
-
     case WM_USER_SHELLICON:
         // systray msg callback 
-        switch (LOWORD(lParam))
+        if (LOWORD(lParam) == WM_RBUTTONDOWN)
         {
-        case WM_RBUTTONDOWN:
+            POINT clickPoint;
             UINT uFlag = MF_BYPOSITION | MF_STRING;
-            GetCursorPos(&lpClickPoint);
+            GetCursorPos(&clickPoint);
             hPopMenu = CreatePopupMenu();
             InsertMenu(hPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_ABOUT, _T("About"));
             if (bDisable)
@@ -77,9 +74,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             InsertMenu(hPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_EXIT, _T("Exit"));
 
             SetForegroundWindow(hWnd);
-            TrackPopupMenu(hPopMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_BOTTOMALIGN, lpClickPoint.x, lpClickPoint.y, 0, hWnd, NULL);
+            TrackPopupMenu(hPopMenu, TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_BOTTOMALIGN, clickPoint.x, clickPoint.y, 0, hWnd, NULL);
             return TRUE;
-
         }
         break;
     case WM_COMMAND:
