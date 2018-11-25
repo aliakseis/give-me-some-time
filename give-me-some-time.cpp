@@ -10,10 +10,8 @@ enum { IDEVT_TIMER = 1234 };
 // Global Variables:
 HINSTANCE hInst;	// current instance
 NOTIFYICONDATA nidApp;
-HMENU hPopMenu;
 TCHAR szTitle[MAX_LOADSTRING];					// The title bar text
 TCHAR szWindowClass[MAX_LOADSTRING];			// the main window class name
-TCHAR szApplicationToolTip[MAX_LOADSTRING];	    // the main window class name
 BOOL bDisable = FALSE;							// keep application state
 
 
@@ -55,7 +53,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             POINT clickPoint;
             UINT uFlag = MF_BYPOSITION | MF_STRING;
             GetCursorPos(&clickPoint);
-            hPopMenu = CreatePopupMenu();
+            HMENU hPopMenu = CreatePopupMenu();
             InsertMenu(hPopMenu, 0xFFFFFFFF, MF_BYPOSITION | MF_STRING, IDM_ABOUT, _T("About"));
             if (bDisable)
             {
@@ -120,6 +118,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_DESTROY:
         PostQuitMessage(0);
         break;
+    case WM_QUERYENDSESSION:
+        return TRUE; // allow automatic close
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
@@ -193,6 +193,25 @@ BOOL InitInstance(HINSTANCE hInstance, int /*nCmdShow*/)
     return TRUE;
 }
 
+HRESULT RegisterApplicationRestartStub(PCWSTR pwzCommandline, DWORD dwFlags)
+{
+    typedef HRESULT(_stdcall *RegisterApplicationRestartT)(PCWSTR pwzCommandline, DWORD dwFlags);
+
+    HMODULE hModule = ::LoadLibrary(_T("kernel32.dll"));
+    if (hModule == NULL)
+        return E_FAIL;
+    RegisterApplicationRestartT proc =
+        reinterpret_cast<RegisterApplicationRestartT>(::GetProcAddress(hModule, "RegisterApplicationRestart"));
+    if (proc == NULL)
+    {
+        ::FreeLibrary(hModule);
+        return E_FAIL;
+    }
+    HRESULT ret = (proc)(pwzCommandline, dwFlags);
+    ::FreeLibrary(hModule);
+    return ret;
+}
+
 } // namespace
 
 int APIENTRY _tWinMain(HINSTANCE hInstance,
@@ -223,6 +242,8 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	{
 		return FALSE;
 	}
+
+    RegisterApplicationRestartStub(L"", 0);
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_GIVEMESOMETIME));
 
